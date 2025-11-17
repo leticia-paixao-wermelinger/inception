@@ -8,6 +8,9 @@ services:
     volumes:
       - ./requirements/nginx/conf/:/etc/nginx/http.d/
       - ./requirements/nginx/tools:/etc/nginx/ssl/
+      - wordpress:/var/www/html
+    depends_on:
+      - wordpress
     ports:
       - 80:80
       - 443:443
@@ -57,22 +60,24 @@ services:
       WORDPRESS_USER_EMAIL: ${WP_USEREMAIL}
       WORDPRESS_USER_PASS: ${WP_USERPASS}
       WORDPRESS_HOST: ${WP_HOST}
-    volumes:
-      - wordpress:/var/www/html
+    #volumes:
+    #  - wordpress:/var/www/html
+    #  - /home/${USER}/data/wordpress:/var/www/html
 
 volumes:
   wordpress:
-    name: wordpress
-    driver_opts:
-      o: bind
-      type: none
-      device: /home/${USER}/data/wordpress
+  #  name: wordpress
+  #  driver_opts:
+  #    o: bind
+  #    type: none
+  #    device: /home/${USER}/data/wordpress
   mariadb:
     name: mariadb
     driver_opts:
       o: bind
       type: none
       device: /home/${USER}/data/mariadb
+
 networks:
     inception:
         name: inception
