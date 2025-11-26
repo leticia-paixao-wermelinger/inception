@@ -56,4 +56,5 @@ RUN chmod +x /bin/wp-config-create.sh && chmod -R 0777 wp-content/
 # Expõe a porta 9000 (padrão do PHP-FPM)
 EXPOSE 9000
 # Comando para executar o script de criação do wp-config.php e iniciar o PHP-FPM
-CMD ["/bin/wp-config-create.sh"]
+#CMD ["/bin/wp-config-create.sh"]
+CMD ["/bin/sh", "-c", "/bin/wp-config-create.sh && /usr/sbin/php-fpm83 -F"]

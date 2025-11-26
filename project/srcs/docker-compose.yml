@@ -30,8 +30,8 @@ services:
         DB_ROOT: ${DB_ROOT}
     container_name: mariadb
     image: mariadb_img
-    #volumes:
-    #  - mariadb:/var/lib/mysql
+    volumes:
+      - mariadb:/var/lib/mysql
     networks:
       - inception
     restart: always
@@ -60,17 +60,17 @@ services:
       WORDPRESS_USER_EMAIL: ${WP_USEREMAIL}
       WORDPRESS_USER_PASS: ${WP_USERPASS}
       WORDPRESS_HOST: ${WP_HOST}
-    #volumes:
-    #  - wordpress:/var/www/html
+    volumes:
+      - wordpress:/var/www/html
     #  - /home/${USER}/data/wordpress:/var/www/html
 
 volumes:
   wordpress:
-  #  name: wordpress
-  #  driver_opts:
-  #    o: bind
-  #    type: none
-  #    device: /home/${USER}/data/wordpress
+    name: wordpress
+    driver_opts:
+      o: bind
+      type: none
+      device: /home/${USER}/data/wordpress
   mariadb:
     name: mariadb
     driver_opts:
