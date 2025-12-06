@@ -1,5 +1,5 @@
 #!/bin/sh
-cd /var/www;
+cd /var/www/html;
 
 # Altera recursivamente o dono do diretório /var/www/html para o usuário/grupo UID 33.
 # chown -R 33:33 /var/www/html;
@@ -9,7 +9,7 @@ cd /var/www;
 if [ ! -f "/var/www/html/wp-config.php" ]; then
   # Atualiza o WP-CLI para a versão mais recente.
   # --debug ativa saída detalhada para logs.
-  wp cli --allow-root update
+  #wp cli --allow-root update
   # Cria o arquivo wp-config.php com as variáveis do banco.
   # --force garante sobrescrita se já existir.
   /usr/local/bin/wp config create --allow-root --dbname="${WORDPRESS_DB_NAME}" --dbuser="${WORDPRESS_DB_USER}" --dbpass="${WORDPRESS_DB_PASSWORD}" --dbhost="${WORDPRESS_DB_HOST}" --force

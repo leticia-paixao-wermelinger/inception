@@ -10,7 +10,7 @@ RUN apk update && apk upgrade && apk add --no-cache nginx
 
 # EXPOSE documenta que o container escuta nas portas 80 e 443. 
 # Não publica portas por si só — o docker run -p ou docker-compose faz o mapeamento.
-EXPOSE 80 443
+EXPOSE 443
 
 # CMD define o comando padrão que será executado quando o container iniciar.
 # nginx -g 'daemon off;' mantém o nginx em primeiro plano (não em background). Isso é necessário em containers para que o processo principal não finalize — o container morre se não houver processo em foreground.

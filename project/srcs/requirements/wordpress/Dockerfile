@@ -39,7 +39,7 @@ RUN apk update && apk upgrade && apk add --no-cache \
     # remove cache de pacotes (limpeza extra para reduzir tamanho da imagem). Observação: como --no-cache foi usado, cache já não deveria ser persistente, mas é uma limpeza defensiva.
     rm -f /var/cache/apk/*
 # Define o diretório de trabalho para as instruções seguintes
-WORKDIR /var/www
+WORKDIR /var/www/html
 #VOLUME /var/www/html
 # Baixa e descompacta o WordPress na versão 6.8.3
 RUN wget https://wordpress.org/wordpress-6.8.3.zip && \
@@ -57,4 +57,6 @@ RUN chmod +x /bin/wp-config-create.sh && chmod -R 0777 wp-content/
 EXPOSE 9000
 # Comando para executar o script de criação do wp-config.php e iniciar o PHP-FPM
 #CMD ["/bin/wp-config-create.sh"]
-CMD ["/bin/sh", "-c", "/bin/wp-config-create.sh && /usr/sbin/php-fpm83 -F"]
+
+#CMD ["/bin/sh", "-c", "/bin/wp-config-create.sh && /usr/sbin/php-fpm -F"]
+CMD ["/bin/sh", "-c", "/bin/wp-config-create.sh && php-fpm${PHP_VERSION} -F"]
