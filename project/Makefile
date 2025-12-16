@@ -76,6 +76,19 @@ shell-mariadb:
 env:
 	./make_env.sh
 
+# ==================== VOLUME CLEANUP ====================
+clean-volumes:
+	@echo "⚠️  Limpando volumes em /home/$(USER)/data/{wordpress,mariadb}..."
+	@for dir in /home/$(USER)/data/wordpress /home/$(USER)/data/mariadb; do \
+		if [ -d $$dir ]; then \
+			sudo find $$dir -mindepth 1 -delete; \
+			echo "✓ Conteúdo removido em $$dir (pastas preservadas)"; \
+		else \
+			echo "ℹ️  Diretório $$dir não existe, ignorando"; \
+		fi \
+	done
+	@echo "✓ Volumes limpos e pastas mantidas vazias"
+
 # ==================== SSL CERTIFICATES ====================
 cert-renew:
 	@echo "🔐 Removendo certificados antigos..."
@@ -106,4 +119,4 @@ cert-install-tools:
 	sudo apt install libnss3-tools mkcert -y
 	@echo "✓ Ferramentas instaladas com sucesso!"
 
-.PHONY : all build up stop start restart down clean fclean re ps logs logs-nginx logs-wordpress logs-mariadb shell-nginx shell-wordpress shell-mariadb env cert-renew cert-check cert-install-tools 
+.PHONY : all build up stop start restart down clean fclean re ps logs logs-nginx logs-wordpress logs-mariadb shell-nginx shell-wordpress shell-mariadb env clean-volumes cert-renew cert-check cert-install-tools 
