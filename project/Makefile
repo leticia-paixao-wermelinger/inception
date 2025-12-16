@@ -37,7 +37,7 @@ clean: down
 	docker system prune -f -a
 	@echo "✓ Imagens e networks limpas"
 
-fclean: clean
+fclean: clean clean-volumes
 	docker volume rm $$(docker volume ls -q | grep inception) 2>/dev/null || true
 	docker rmi $$(docker images | grep inception | awk '{print $$3}') 2>/dev/null || true
 	@echo "✓ Todos os volumes e imagens removidos"
