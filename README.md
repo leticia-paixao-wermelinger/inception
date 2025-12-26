@@ -9,30 +9,14 @@ Containerized WordPress stack with NGINX and MariaDB, packaged with Docker Compo
 - Stack: NGINX reverse proxy with HTTPS, php-fpm WordPress, MariaDB, custom Docker network, and named volumes for persistence.
 - Entry points: website at `https://lpaixao-.42.fr` and admin at `https://lpaixao-.42.fr/wp-admin` after the stack is up.
 
-## Architecture
-```
-┌───────────────────────────────┐
-│  Docker network "inception"   │
-│  ┌────────┐  ┌──────────┐     │
-│  │ NGINX  │◄─┤ WordPress│◄──┐ │
-│  │ :443   │  │ :9000    │   │ │
-│  └────────┘  └──────────┘   │ │
-│              ▲              │ │
-│        ┌─────┴─────┐        │ │
-│        │ MariaDB   │        │ │
-│        │  :3306    │        │ │
-│        └───────────┘        │ │
-└──────────────────────────────┘
-```
-
 ## Project Description
 - Docker usage: single `docker-compose.yml` orchestrates three images (custom Dockerfiles per service), a dedicated bridge network, and named volumes for data durability.
-- Sources included: NGINX, WordPress, and MariaDB Dockerfiles plus configuration in `project/srcs/requirements/*`, secrets expected under `project/secrets/`, and Make targets in `project/Makefile`.
-- Design choices: HTTPS-only entrypoint via mkcert certificates, non-root service users, isolated network, and separate volumes for DB and CMS content.
+- Sources included: NGINX, WordPress, and MariaDB Dockerfiles plus configuration in `project/srcs/requirements/*`, environment variables defined in `project/srcs/.env`, and Make targets in `project/Makefile`.
+- Important choices: HTTPS-only entrypoint via mkcert certificates, non-root service users, isolated network, and separate volumes for DB and CMS (Content Management System) content.
 - Virtual Machines vs Docker: Docker offers faster provisioning, layered images, and lower resource overhead; VMs provide stronger isolation but heavier boot and maintenance.
-- Secrets vs Environment Variables: secrets files on disk avoid leaking sensitive values in process lists or Compose descriptors; env vars ease development but risk exposure; this stack reads secrets from files.
-- Docker Network vs Host Network: custom bridge network namespaces traffic and DNS between containers; host networking would forgo isolation and port mapping but is unnecessary here.
-- Docker Volumes vs Bind Mounts: named volumes give controlled lifecycle and safe ownership for database and WordPress data; bind mounts help live-editing but are avoided to keep the runtime immutable and reproducible.
+- Secrets vs Environment Variables: this stack uses a `.env` file for configuration.
+- Docker Network vs Host Network: custom bridge network and DNS between containers, keeping internal traffic isolated from the host system.
+- Docker Volumes vs Bind Mounts: this project uses bind mounts (via named volumes backed by `/home/${USER}/data/*`) to persist MariaDB and WordPress data on the host, ensuring data survives container removal and simplifying backup/recovery; pure Docker-managed volumes would offer slightly better isolation but bind mounts give transparent access to the data.
 
 ## Instructions
 1) Prerequisites: Linux with Docker >= 20.10, Docker Compose v2, mkcert, and sudo privileges for initial setup.

@@ -127,6 +127,7 @@ volumes:
     # diretório do host para garantir persistência fora do Docker.
     name: wordpress
     driver_opts:
+      # bind mount = monta um diretório do host diretamente no volume
       o: bind
       type: none
       device: /home/${USER}/data/wordpress
@@ -134,6 +135,7 @@ volumes:
     # Volume nomeado para MariaDB, também mapeado para /home/${USER}/data/mariadb
     name: mariadb
     driver_opts:
+      # bind mount = monta um diretório do host diretamente no volume
       o: bind
       type: none
       device: /home/${USER}/data/mariadb
@@ -142,4 +144,5 @@ networks:
   # Rede customizada para isolar os serviços do projeto
   inception:
     name: inception
+    # Tipo de rede: bridge (padrão do Docker para redes customizadas)
     driver: bridge
