@@ -1,4 +1,24 @@
+# ##############################################
+# Script de preparação do WordPress usado dentro do container
+# Resumo: cria/atualiza o arquivo wp-config.php, define constantes necessárias
+# e realiza a instalação inicial do WordPress via WP-CLI quando necessário.
+# Variáveis de ambiente esperadas (passadas pelo docker-compose ou env):
+#  - WORDPRESS_DB_NAME
+#  - WORDPRESS_DB_USER
+#  - WORDPRESS_DB_PASSWORD
+#  - WORDPRESS_DB_HOST
+#  - WORDPRESS_HOST
+#  - WORDPRESS_TITLE
+#  - WORDPRESS_ADM_NAME
+#  - WORDPRESS_ADM_PASS
+#  - WORDPRESS_ADM_EMAIL
+#  - WORDPRESS_USERNAME
+#  - WORDPRESS_USER_EMAIL
+#  - WORDPRESS_USER_PASS
+# ##############################################
+
 #!/bin/sh
+
 cd /var/www/html;
 
 # Altera recursivamente o dono do diretório /var/www/html para o usuário/grupo UID 33.

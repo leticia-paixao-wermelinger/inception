@@ -1,3 +1,16 @@
+##############################################
+# NGINX Dockerfile
+# Resumo: constrói a imagem do NGINX usada no ambiente Docker Compose.
+# Objetivo: instalar e configurar o NGINX para servir o site WordPress com TLS,
+#           mantendo a imagem leve (base Alpine).
+# Notas/recursos esperados:
+#  - certificados TLS devem ser montados em /etc/nginx/ssl
+#  - arquivos do site em /var/www/html via volume
+#  - o serviço 'wordpress' deve estar disponível na rede do compose
+# Segurança:
+#  - não inclua chaves privadas na imagem; monte-as via volumes/secret manager.
+##############################################
+
 # define a imagem base do container: alpine:3.21 (uma distribuição Linux mínima, muito leve)
 FROM alpine:3.21
 

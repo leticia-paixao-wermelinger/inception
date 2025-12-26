@@ -1,7 +1,23 @@
+# ##############################################
+# WordPress Dockerfile
+# Resumo: constrói a imagem para o serviço WordPress (PHP-FPM).
+# Objetivo: instalar PHP e extensões necessárias, preparar o diretório
+# /var/www/html com os arquivos do WordPress e disponibilizar o WP-CLI.
+# Variáveis/recursos esperados:
+#  - PHP_VERSION (opcional) para escolher a versão do PHP
+#  - /var/www/html normalmente será montado como volume com o conteúdo do site
+# Observações de segurança:
+#  - Não inclua senhas/segredos na imagem; use variáveis de ambiente ou secrets
+#    e monte arquivos sensíveis em runtime.
+# ##############################################
+
+# define a imagem base do container: alpine:3.21 (uma distribuição Linux mínima, muito leve)
 FROM alpine:3.21
 
+# ARG para definir a versão do PHP a ser instalada (padrão: 8.3)
 ARG PHP_VERSION=83
 
+# Define a variável de ambiente PHP_VERSION com o valor do ARG PHP_VERSION
 ENV PHP_VERSION=${PHP_VERSION}
 
 RUN apk update && apk upgrade && apk add --no-cache \

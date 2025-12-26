@@ -1,84 +1,137 @@
+##############################################
+# Docker Compose file for Inception project
+# Resumo: orquestra três serviços principais — mariadb, wordpress e nginx —
+# Objetivo: definir builds, volumes, redes e variáveis de ambiente usados
+# pelo projeto. Este arquivo é usado pelo Makefile (`docker compose -f ./srcs/docker-compose.yml`).
+#
+# Principais pontos explicados abaixo:
+#  - Services: declara os containers (mariadb, wordpress, nginx)
+#  - Volumes: diretórios montados para persistência (bind mounts em /home/${USER}/data)
+#  - Networks: rede customizada `inception`
+#
+# Variáveis importantes:
+#  - DB_NAME, DB_USER, DB_PASS, DB_ROOT  → usadas pelo MariaDB
+#  - WP_TITLE, ADM_WP_NAME, ADM_WP_PASS, ADM_WP_EMAIL → usadas para instalar WP
+#  - WP_USERNAME, WP_USEREMAIL, WP_USERPASS, WP_HOST → usados pelo WP-CLI
+#  - USER → usado para montar volumes locais em /home/${USER}/data
+#
+# Observações de segurança e operação:
+#  - Os certificados TLS devem ser colocados em ./requirements/nginx/tools e
+#    são montados em /etc/nginx/ssl no container nginx.
+#  - Os volumes usam bind mounts para `/home/${USER}/data/*` para que os dados
+#    persistam fora do Docker. Garanta que a pasta exista e tenha permissões
+#    corretas (o Makefile já tenta criar /home/${USER}/data em `make build`).
+##############################################
 services:
+  # MariaDB service: banco de dados relacional (MariaDB/MySQL)
   mariadb:
+    # 'build' descreve como construir a imagem localmente (Dockerfile customizado)
     build:
+      # contexto de build (onde o Dockerfile e arquivos relacionados vivem)
       context: .
+      # caminho relativo para o Dockerfile do MariaDB
       dockerfile: requirements/mariadb/Dockerfile
+      # args que serão passadas ao build (podem vir de um .env ou do ambiente)
       args:
         DB_NAME: ${DB_NAME}
         DB_USER: ${DB_USER}
         DB_PASS: ${DB_PASS}
         DB_ROOT: ${DB_ROOT}
+    # Nome explícito do container em tempo de execução
     container_name: mariadb
+    # nome da imagem resultante (útil para caching/identificação)
     image: mariadb_img
+    # volume nomeado que persiste os dados do MariaDB (apontado para bind mount mais abaixo)
     volumes:
       - mariadb:/var/lib/mysql
+    # conecta o container à rede customizada `inception`
     networks:
       - inception
-    #ports:
-    #  - 3306:3306
+    # Healthcheck: comando usado pelo Docker para verificar se o serviço está pronto
     healthcheck:
+      # usa mysqladmin ping para testar se o servidor responde
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
       interval: 3s
       timeout: 5s
       retries: 10
+    # política de reinício do container em caso de falha
     restart: always
+  # WordPress service: executa o PHP-FPM e serve o CMS (backend)
   wordpress:
+    # Build: usa o Dockerfile específico dentro de requirements/wordpress
     build:
       context: ./requirements/wordpress
     container_name: wordpress
     image: wordpress_img
+    # Reinicia automaticamente se o processo principal terminar
     restart: always
+    # Garante que o WordPress só inicie depois do MariaDB reportar healthy
     depends_on:
       mariadb:
         condition: service_healthy
-    #ports:
-    #  - 9000:9000
+    # Rede compartilhada com os outros serviços
     networks:
       - inception
+    # Variáveis de ambiente que configuram o WP (passadas ao WP-CLI / scripts)
     environment:
+      # hostname do banco usado pelo WordPress (resolve para o serviço mariadb)
       WORDPRESS_DB_HOST: mariadb
+      # credenciais do banco (definidas externamente via .env ou ambiente)
       WORDPRESS_DB_USER: ${DB_USER}
       WORDPRESS_DB_PASSWORD: ${DB_PASS}
       WORDPRESS_DB_NAME: ${DB_NAME}
+      # Metadados para instalação do WordPress
       WORDPRESS_TITLE: ${WP_TITLE}
       WORDPRESS_ADM_NAME: ${ADM_WP_NAME}
       WORDPRESS_ADM_PASS: ${ADM_WP_PASS}
       WORDPRESS_ADM_EMAIL: ${ADM_WP_EMAIL}
+      # Usuário extra criado para uso em testes/edição
       WORDPRESS_USERNAME: ${WP_USERNAME}
       WORDPRESS_USER_EMAIL: ${WP_USEREMAIL}
       WORDPRESS_USER_PASS: ${WP_USERPASS}
+      # Host/URL público do WordPress (usado pelo WP-CLI para gerar URLs corretas)
       WORDPRESS_HOST: ${WP_HOST}
+    # Volume nomeado que persiste os arquivos do WordPress (/var/www/html)
     volumes:
       - wordpress:/var/www/html
-    #  - /home/${USER}/data/wordpress:/var/www/html
+  # NGINX service: servidor web reverso que expõe HTTPS ao host
   nginx:
     build:
       context: ./requirements/nginx
     container_name: nginx
     image: nginx_img
     restart: always
+    # Volumes montados no NGINX:
     volumes:
+      # arquivo(s) de configuração (nginx.conf / http.d) montados do repositório
       - ./requirements/nginx/conf/:/etc/nginx/http.d/
+      # certificados TLS (crt/key) montados aqui — cuide das permissões
       - ./requirements/nginx/tools:/etc/nginx/ssl/
+      # montamos também o volume do wordpress para servir arquivos estáticos
       - wordpress:/var/www/html
+    # NGINX espera que o serviço WordPress esteja disponível
     depends_on:
       - wordpress
+    # Mapeamento de portas: HTTPS (443) disponível no host
     ports:
       - 443:443
     networks:
       - inception
+    # Variáveis de ambiente simples; podem ser usadas pelo Dockerfile/entrypoint
     environment:
       - NGINX_HOST=foobar.com
       - NGINX_PORT=80
-
 volumes:
   wordpress:
+    # Volume nomeado para WordPress. Aqui é configurado como bind mount para um
+    # diretório do host para garantir persistência fora do Docker.
     name: wordpress
     driver_opts:
       o: bind
       type: none
       device: /home/${USER}/data/wordpress
   mariadb:
+    # Volume nomeado para MariaDB, também mapeado para /home/${USER}/data/mariadb
     name: mariadb
     driver_opts:
       o: bind
@@ -86,6 +139,7 @@ volumes:
       device: /home/${USER}/data/mariadb
 
 networks:
-    inception:
-        name: inception
-        driver: bridge
+  # Rede customizada para isolar os serviços do projeto
+  inception:
+    name: inception
+    driver: bridge
