@@ -52,7 +52,22 @@ make restart   # restart the running stack
 3) Open `https://lpaixao-.42.fr/wp-admin` for WordPress admin.
 
 ## Credentials
-- Stored in `project/srcs/.env` (gitignored). Contains database passwords, WordPress admin credentials, and other configuration.
+
+### Environment Variables
+- Application credentials are stored in `project/srcs/.env` (gitignored).
+- This file contains:
+  - MariaDB credentials (database name, user, and password)
+  - WordPress admin username and password
+- To change credentials, stop the stack, update the `.env` file, and restart the project with `make all`.
+- Note: changes to database users or passwords only apply on first initialization. To fully reset credentials, run `make fclean` (this removes stored data).
+
+### TLS Certificates
+- HTTPS certificates are generated locally using `mkcert`.
+- Certificate files are located under `project/srcs/requirements/nginx/tools/`.
+- Certificates can be regenerated at any time using:
+```bash
+make cert-renew
+```
 
 ## Check Services Are Running
 ```bash
