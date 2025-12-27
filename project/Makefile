@@ -72,10 +72,6 @@ shell-wordpress:
 shell-mariadb:
 	docker compose -f ./srcs/docker-compose.yml exec mariadb bash
 
-# ==================== UTILITIES ====================
-env:
-	./make_env.sh
-
 # ==================== VOLUME CLEANUP ====================
 clean-volumes:
 	@echo "⚠️  Limpando volumes em /home/$(USER)/data/{wordpress,mariadb}..."
