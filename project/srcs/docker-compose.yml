@@ -117,10 +117,6 @@ services:
       - 443:443
     networks:
       - inception
-    # Variáveis de ambiente simples; podem ser usadas pelo Dockerfile/entrypoint
-    environment:
-      - NGINX_HOST=foobar.com
-      - NGINX_PORT=80
 volumes:
   wordpress:
     # Volume nomeado para WordPress. Aqui é configurado como bind mount para um
