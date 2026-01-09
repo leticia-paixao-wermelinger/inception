@@ -51,26 +51,26 @@ ps:
 	docker compose -f ./srcs/docker-compose.yml ps
 
 logs:
-	$(COMPOSE) logs -f
+	docker logs --tail 1000 -f
 
 logs-nginx:
-	$(COMPOSE) logs -f nginx
+	docker logs --tail 1000 -f nginx
 
 logs-wordpress:
-	$(COMPOSE) logs -f wordpress
+	docker logs --tail 1000 -f wordpress
 
 logs-mariadb:
-	$(COMPOSE) logs -f mariadb
+	docker logs --tail 1000 -f mariadb
 
 # ==================== SHELL ACCESS ====================
 shell-nginx:
-	docker compose -f ./srcs/docker-compose.yml exec nginx sh
+	docker exec -it nginx sh
 
 shell-wordpress:
-	docker compose -f ./srcs/docker-compose.yml exec wordpress bash
+	docker exec -it wordpress sh
 
 shell-mariadb:
-	docker compose -f ./srcs/docker-compose.yml exec mariadb bash
+	docker exec -it exec mariadb sh
 
 # ==================== VOLUME CLEANUP ====================
 clean-volumes:
