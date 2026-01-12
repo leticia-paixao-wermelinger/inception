@@ -40,7 +40,7 @@ services:
     # Nome explícito do container em tempo de execução
     container_name: mariadb
     # nome da imagem resultante (útil para caching/identificação)
-    image: mariadb_img
+    image: mariadb
     # volume nomeado que persiste os dados do MariaDB (apontado para bind mount mais abaixo)
     volumes:
       - mariadb:/var/lib/mysql
@@ -62,7 +62,7 @@ services:
     build:
       context: ./requirements/wordpress
     container_name: wordpress
-    image: wordpress_img
+    image: wordpress
     # Reinicia automaticamente se o processo principal terminar
     restart: always
     # Garante que o WordPress só inicie depois do MariaDB reportar healthy
@@ -99,7 +99,7 @@ services:
     build:
       context: ./requirements/nginx
     container_name: nginx
-    image: nginx_img
+    image: nginx
     restart: always
     # Volumes montados no NGINX:
     volumes:
